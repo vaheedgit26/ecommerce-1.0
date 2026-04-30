@@ -18,7 +18,8 @@ def health():
     return {"status": "ok"}
 
 # Main gateway route
-@app.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+# @app.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+@app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def gateway(service: str, path: str, request: Request):
     base_url = SERVICE_MAP.get(service)
 
