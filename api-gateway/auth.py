@@ -3,9 +3,15 @@ from jose import jwt
 import requests
 from config import JWKS_URL, COGNITO_ISSUER, APP_CLIENT_ID
 
-jwks = requests.get(JWKS_URL).json()
+
+# 🔥 Fetch JWKS dynamically (NO global caching)
+def get_jwks():
+    return requests.get(JWKS_URL).json()
+
 
 def get_public_key(token):
+    jwks = get_jwks()  # ✅ FIX: fetch fresh keys when needed
+
     headers = jwt.get_unverified_header(token)
     kid = headers.get("kid")
 
@@ -14,6 +20,7 @@ def get_public_key(token):
             return key
 
     raise HTTPException(status_code=401, detail="Invalid token key")
+
 
 def verify_jwt(request: Request):
     auth_header = request.headers.get("Authorization")
