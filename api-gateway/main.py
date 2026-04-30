@@ -38,14 +38,16 @@ async def gateway(service: str, path: str, request: Request):
     if service not in PUBLIC_ROUTES:
         verify_jwt(request)
 
-    # ✅ Build correct URL (IMPORTANT: include service prefix)
-    query = request.url.query
+    # ✅ Normalize path (handle trailing slashes safely)
+    clean_path = path.strip("/") if path else ""
 
-    if path:
-        url = f"{base_url}/{service}/{path}"
+    if clean_path:
+        url = f"{base_url}/{service}/{clean_path}"
     else:
         url = f"{base_url}/{service}"
 
+    # ✅ Preserve query params
+    query = request.url.query
     if query:
         url = f"{url}?{query}"
 
@@ -79,5 +81,4 @@ async def gateway(service: str, path: str, request: Request):
 
     except httpx.RequestError as e:
         logging.error(f"Service call failed: {str(e)}")
-
         raise HTTPException(status_code=502, detail="Service unavailable")
