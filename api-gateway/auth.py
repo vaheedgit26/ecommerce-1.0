@@ -4,13 +4,13 @@ import requests
 from config import JWKS_URL, COGNITO_ISSUER, APP_CLIENT_ID
 
 
-# 🔥 Fetch JWKS dynamically (NO global caching)
+# 🔥 Fetch JWKS dynamically (no caching for safety)
 def get_jwks():
     return requests.get(JWKS_URL).json()
 
 
 def get_public_key(token):
-    jwks = get_jwks()  # ✅ FIX: fetch fresh keys when needed
+    jwks = get_jwks()
 
     headers = jwt.get_unverified_header(token)
     kid = headers.get("kid")
@@ -28,7 +28,12 @@ def verify_jwt(request: Request):
     if not auth_header:
         raise HTTPException(status_code=401, detail="Missing token")
 
-    token = auth_header.split(" ")[1]
+    # ✅ FIXED: safe token parsing
+    parts = auth_header.split()
+    if len(parts) != 2:
+        raise HTTPException(status_code=401, detail="Invalid token format")
+
+    token = parts[1]
 
     try:
         key = get_public_key(token)
