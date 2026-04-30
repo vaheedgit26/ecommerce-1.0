@@ -27,7 +27,12 @@ async def gateway(service: str, path: str, request: Request):
         raise HTTPException(status_code=404, detail="Service not found")
 
     # 🔐 Protect all except products
-    if service != "products":
+    # if service != "products":
+    #    verify_jwt(request)
+
+    PUBLIC_ROUTES = ["products"]
+
+    if service not in PUBLIC_ROUTES:
         verify_jwt(request)
 
     url = f"{base_url}/{path}"
