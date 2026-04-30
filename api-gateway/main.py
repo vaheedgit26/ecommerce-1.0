@@ -3,6 +3,7 @@ import httpx
 from auth import verify_jwt
 
 from fastapi.middleware.cors import CORSMiddleware
+import logging
  
 app = FastAPI()
 
@@ -19,7 +20,6 @@ app.add_middleware(
 #        "http://localhost:3000"                # local dev
 #    ],
 
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
