@@ -2,7 +2,22 @@ from fastapi import FastAPI, Request, HTTPException
 import httpx
 from auth import verify_jwt
 
+from fastapi.middleware.cors import CORSMiddleware
+ 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # change in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# allow_origins=[
+#        "https://your-cloudfront-domain.com",  # production
+#        "http://localhost:3000"                # local dev
+#    ],
 
 # Service mapping (Kubernetes service names)
 SERVICE_MAP = {
