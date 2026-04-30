@@ -26,6 +26,13 @@ def health():
     return {"status": "ok"}
 
 
+# 🔥 Handle /api/{service} (no trailing slash case)
+@app.api_route("/api/{service}", methods=["GET", "POST", "PUT", "DELETE"])
+async def gateway_root(service: str, request: Request):
+    return await gateway(service, "", request)
+
+
+# 🔥 Handle /api/{service}/... (normal case)
 @app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def gateway(service: str, path: str, request: Request):
 
