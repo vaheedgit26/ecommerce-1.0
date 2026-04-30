@@ -1,4 +1,3 @@
-```python
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import Response
 import httpx
@@ -18,7 +17,7 @@ SERVICE_MAP = {
     "orders": "http://order-service"
 }
 
-# सार्वजनिक routes (no auth required)
+# Public routes (no auth required)
 PUBLIC_ROUTES = ["products"]
 
 # Health check
@@ -39,9 +38,13 @@ async def gateway(service: str, path: str, request: Request):
     if service not in PUBLIC_ROUTES:
         verify_jwt(request)
 
-    # ✅ Build target URL (with query params)
+    # ✅ Build correct URL (IMPORTANT: include service prefix)
     query = request.url.query
-    url = f"{base_url}/{path}" if path else f"{base_url}/"
+
+    if path:
+        url = f"{base_url}/{service}/{path}"
+    else:
+        url = f"{base_url}/{service}"
 
     if query:
         url = f"{url}?{query}"
@@ -49,7 +52,7 @@ async def gateway(service: str, path: str, request: Request):
     # Debug logging
     logging.info(f"{request.method} → {url}")
 
-    # ✅ Clean headers (remove problematic ones)
+    # ✅ Clean headers
     headers = {
         k: v for k, v in request.headers.items()
         if k.lower() not in ["host", "content-length", "connection"]
@@ -67,7 +70,7 @@ async def gateway(service: str, path: str, request: Request):
                 content=await request.body()
             )
 
-        # ✅ Return raw response (no JSON corruption)
+        # ✅ Return raw response
         return Response(
             content=resp.content,
             status_code=resp.status_code,
@@ -76,5 +79,7 @@ async def gateway(service: str, path: str, request: Request):
 
     except httpx.RequestError as e:
         logging.error(f"Service call failed: {str(e)}")
+
+
         raise HTTPException(status_code=502, detail="Service unavailable")
 ```
