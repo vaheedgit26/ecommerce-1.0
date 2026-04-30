@@ -80,6 +80,4 @@ async def gateway(service: str, path: str, request: Request):
     except httpx.RequestError as e:
         logging.error(f"Service call failed: {str(e)}")
 
-
         raise HTTPException(status_code=502, detail="Service unavailable")
-```
