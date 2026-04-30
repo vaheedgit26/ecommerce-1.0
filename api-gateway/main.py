@@ -8,8 +8,8 @@ app = FastAPI()
 SERVICE_MAP = {
     "products": "http://product-service",
     "cart": "http://cart-service",
-    "user": "http://user-service",
-    "order": "http://order-service"
+    "users": "http://user-service",
+    "orders": "http://order-service"
 }
 
 PUBLIC_ROUTES = ["products"]
