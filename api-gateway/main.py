@@ -19,6 +19,14 @@ app.add_middleware(
 #        "http://localhost:3000"                # local dev
 #    ],
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+@app.api_route("/api/{service}/{path:path}", methods=["GET","POST","PUT","DELETE"])
+async def gateway(service: str, path: str, request: Request):
+    logging.info(f"Routing request to service: {service}, path: {path}")
+ 
 # Service mapping (Kubernetes service names)
 SERVICE_MAP = {
     "products": "http://product-service",
