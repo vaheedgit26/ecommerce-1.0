@@ -30,7 +30,8 @@ async def gateway(service: str, path: str, request: Request):
     if service not in PUBLIC_ROUTES:
         verify_jwt(request)
 
-    url = f"{base_url}/{path}" if path else base_url
+    # url = f"{base_url}/{path}" if path else base_url
+    url = f"{base_url}/{path}" if path else f"{base_url}/"
 
     headers = {
         k: v for k, v in request.headers.items()
