@@ -16,6 +16,10 @@ logging.basicConfig(level=logging.INFO)
 # =========================
 app.add_middleware(
     CORSMiddleware,
+    #allow_origins=[
+    #"http://localhost:3000",
+    #"https://your-cloudfront-domain.com"
+    #]
     allow_origins=["*"],  # tighten to CloudFront domain in production
     allow_credentials=True,
     allow_methods=["*"],
