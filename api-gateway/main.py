@@ -19,7 +19,7 @@ app.add_middleware(
     allow_origins=["*"],  # tighten to CloudFront domain in production
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 # =========================
