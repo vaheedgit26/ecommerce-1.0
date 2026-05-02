@@ -1,3 +1,4 @@
+#########################  Stage-I  ###################################
 # Build stage
 FROM node:18-alpine as build
 
@@ -9,6 +10,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
+#########################  Stage-II  ##################################
 # Serve with nginx
 FROM nginx:alpine
 
