@@ -18,7 +18,7 @@ RUN npm run build
 
 FROM nginx:1.24.0-alpine3.17-slim
 
-RUN rm /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# RUN rm /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN mkdir -p /var/cache/nginx/client_temp && \
     mkdir -p /var/cache/nginx/proxy_temp && \
