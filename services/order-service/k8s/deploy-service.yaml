@@ -43,7 +43,7 @@ spec:
     app: order
 
   ports:
-    - port: 8004
+    - port: 80
       targetPort: 8004
       protocol: TCP
 
