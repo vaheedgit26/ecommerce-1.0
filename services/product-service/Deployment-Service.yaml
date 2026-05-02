@@ -24,14 +24,6 @@ spec:
         ports:
         - containerPort: 8001
 
-        env:
-        - name: API_BASE_URL
-          value: "http://api.localdev.me/api"
-        - name: USER_POOL_ID
-          value: "ap-south-1_xxx"
-        - name: CLIENT_ID
-          value: "xxx"
-
         resources:
           requests:
             cpu: "100m"
@@ -51,7 +43,7 @@ spec:
     app: product
 
   ports:
-    - port: 80
+    - port: 8001
       targetPort: 8001
 
   type: ClusterIP
