@@ -43,7 +43,7 @@ spec:
     app: cart
 
   ports:
-    - port: 8002
+    - port: 80
       targetPort: 8002
       protocol: TCP
 
