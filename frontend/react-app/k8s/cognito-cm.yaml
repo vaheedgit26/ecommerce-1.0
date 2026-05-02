@@ -1,1 +1,8 @@
-
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cognito-cm-vars
+data:
+  AWS_REGION: ""  
+  USER_POOL_ID: ""
+  APP_CLIENT_ID: ""
