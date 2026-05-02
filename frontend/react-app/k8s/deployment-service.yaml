@@ -24,9 +24,9 @@ spec:
         ports:
         - containerPort: 80
 
-        envFrom:
-          - configMapRef:
-              name: cognito-cm-vars
+        #envFrom:
+        #  - configMapRef:
+        #      name: cognito-cm-vars
 
         #env:
         #- name: API_BASE_URL
