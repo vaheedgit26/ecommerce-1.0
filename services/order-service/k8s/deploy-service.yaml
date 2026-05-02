@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  
+  selector:
+    matchLabels:
+      app: order
+
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: vaheeddockerhub/ecomm-order:latest   # 🔥 your built image
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 8004
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+spec:
+  selector:
+    app: order
+
+  ports:
+    - port: 8004
+      targetPort: 8004
+      protocol: TCP
+
+  type: ClusterIP
