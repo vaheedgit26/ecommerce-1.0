@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: <your-ecr-repo>/api-gateway:latest
+          image: vaheeddockerhub/api-gateway:latest
           ports:
             - containerPort: 8000
 
@@ -61,5 +61,6 @@ spec:
     app: api-gateway
   ports:
     - port: 80
+      targetPort: 8000
       targetPort: 8000
       protocol: TCP
