@@ -30,10 +30,10 @@ app.add_middleware(
 # K8S SERVICE MAPPING
 # =========================
 SERVICE_MAP = {
-    "products": "http://product-service",
-    "cart": "http://cart-service",
-    "users": "http://user-service",
-    "orders": "http://order-service"
+    "products": "http://product",
+    "cart": "http://cart",
+    "users": "http://user",
+    "orders": "http://order"
 }
 
 # Public routes
