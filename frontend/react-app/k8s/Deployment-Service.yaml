@@ -24,13 +24,17 @@ spec:
         ports:
         - containerPort: 80
 
-        env:
-        - name: API_BASE_URL
-          value: "http://api.localdev.me/api"
-        - name: USER_POOL_ID
-          value: "ap-south-1_xxx"
-        - name: CLIENT_ID
-          value: "xxx"
+        envFrom:
+          - configMapRef:
+              name: cognito-cm-vars
+
+        #env:
+        #- name: API_BASE_URL
+        #  value: "http://api.localdev.me/api"
+        #- name: USER_POOL_ID
+        #  value: "ap-south-1_xxx"
+        #- name: CLIENT_ID
+        #  value: "xxx"
 
         resources:
           requests:
