@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product
+  labels:
+    app: product
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: product
+
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      containers:
+      - name: frontend
+        image: vaheeddockerhub/ecomm-product:latest   # 🔥 your built image
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 8001
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product
+spec:
+  selector:
+    app: product
+
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+
+  type: ClusterIP
