@@ -28,6 +28,11 @@ spec:
           requests:
             cpu: "100m"
             memory: "128Mi"
+
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+
 ---
 apiVersion: v1
 kind: Service
@@ -42,6 +47,5 @@ spec:
       targetPort: 80
 
   type: ClusterIP
-          limits:
-            cpu: "300m"
+           cpu: "300m"
             memory: "256Mi"
