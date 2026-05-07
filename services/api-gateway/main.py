@@ -2,12 +2,9 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
-import requests
 import logging
-import time
 import uuid
 
-from config import JWKS_URL
 from auth import verify_jwt
 
 app = FastAPI()
@@ -15,15 +12,18 @@ app = FastAPI()
 # =========================
 # LOGGING
 # =========================
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # =========================
 # CORS CONFIGURATION
 # =========================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔥 बदल to your frontend domain in production
-    allow_credentials=False,  # must be False when using "*"
+    allow_origins=["*"],  # ⚠️ Change in production
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -42,20 +42,6 @@ SERVICE_MAP = {
 PUBLIC_ROUTES = ["products"]
 
 # =========================
-# JWKS CACHE (COGNITO SAFE)
-# =========================
-jwks_cache = {
-    "data": None,
-    "last_fetch": 0
-}
-
-def get_jwks():
-    if time.time() - jwks_cache["last_fetch"] > 3600:
-        jwks_cache["data"] = requests.get(JWKS_URL).json()
-        jwks_cache["last_fetch"] = time.time()
-    return jwks_cache["data"]
-
-# =========================
 # HEALTH CHECK
 # =========================
 @app.get("/health")
@@ -65,28 +51,15 @@ def health():
 # =========================
 # ROOT ROUTE HANDLER
 # =========================
-@app.api_route("/api/{service}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.api_route("/api/{service}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def gateway_root(service: str, request: Request):
     return await gateway(service, "", request)
 
 # =========================
 # MAIN GATEWAY ROUTE
 # =========================
-@app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def gateway(service: str, path: str, request: Request):
-
-    # =========================
-    # HANDLE PREFLIGHT (CORS)
-    # =========================
-    if request.method == "OPTIONS":
-        return Response(
-            status_code=204,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
-            },
-        )
 
     # =========================
     # SERVICE VALIDATION
@@ -105,9 +78,8 @@ async def gateway(service: str, path: str, request: Request):
     # BUILD TARGET URL
     # =========================
     clean_path = path.strip("/") if path else ""
-    url = f"{base_url}/{clean_path}" if clean_path else f"{base_url}/"
+    url = f"{base_url}/{clean_path}" if clean_path else base_url
 
-    # Preserve query params
     if request.url.query:
         url = f"{url}?{request.url.query}"
 
@@ -120,43 +92,40 @@ async def gateway(service: str, path: str, request: Request):
     # =========================
     # HEADERS FORWARDING
     # =========================
+    excluded_headers = {"host", "content-length", "connection"}
+
     headers = {
         k: v for k, v in request.headers.items()
-        if k.lower() not in ["host", "content-length", "connection"]
+        if k.lower() not in excluded_headers
     }
 
-    # Preserve Authorization header
-    if "authorization" in request.headers:
-        headers["authorization"] = request.headers["authorization"]
-
-    # Add request ID header
     headers["x-request-id"] = request_id
 
     # =========================
-    # FORWARD REQUEST (RETRY)
+    # FORWARD REQUEST
     # =========================
     try:
         async with httpx.AsyncClient(
             timeout=httpx.Timeout(5.0, connect=2.0)
         ) as client:
 
-            for attempt in range(2):  # retry once
-                try:
-                    resp = await client.request(
-                        method=request.method,
-                        url=url,
-                        headers=headers,
-                        content=await request.body(),
-                    )
-                    break
-                except httpx.RequestError as e:
-                    if attempt == 1:
-                        raise e
+            resp = await client.request(
+                method=request.method,
+                url=url,
+                headers=headers,
+                content=await request.body(),
+            )
+
+        # Remove problematic headers from downstream response
+        response_headers = {
+            k: v for k, v in resp.headers.items()
+            if k.lower() not in {"content-encoding", "transfer-encoding", "connection"}
+        }
 
         return Response(
             content=resp.content,
             status_code=resp.status_code,
-            headers=dict(resp.headers),  # preserve all headers
+            headers=response_headers,
         )
 
     except httpx.RequestError as e:
