@@ -109,7 +109,10 @@ async def gateway(service: str, path: str, request: Request):
     }
 
     # Ensure Authorization is preserved
-    headers["authorization"] = request.headers.get("authorization")
+    # headers["authorization"] = request.headers.get("authorization")
+    auth_header = request.headers.get("authorization")
+    if auth_header:
+        headers["authorization"] = auth_header
 
     # =========================
     # HTTP FORWARDING
