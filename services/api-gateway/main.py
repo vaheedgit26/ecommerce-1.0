@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
+from config import JWKS_URL
 import httpx
 import requests
 from auth import verify_jwt
